@@ -70,7 +70,7 @@
 }
 
 .header__brand {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-white);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
