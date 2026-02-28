@@ -39,29 +39,58 @@ export class ShareHelper {
             // Importar html2canvas dinámicamente
             const html2canvas = await import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/+esm');
             
-            // Obtener dimensiones de la card
-            const rect = cardElement.getBoundingClientRect();
+            console.log('📦 html2canvas cargado');
             
-            // Configuración para capturar con márgenes
+            // Crear un contenedor temporal con márgenes
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.left = '-9999px';
+            wrapper.style.top = '0';
+            wrapper.style.padding = '50px 30px';
+            wrapper.style.backgroundColor = '#F9FAFB';
+            wrapper.style.width = `${cardElement.offsetWidth + 60}px`;
+            
+            // Clonar la card
+            const cardClone = cardElement.cloneNode(true);
+            wrapper.appendChild(cardClone);
+            document.body.appendChild(wrapper);
+            
+            console.log('📐 Dimensiones wrapper:', {
+                width: wrapper.offsetWidth,
+                height: wrapper.offsetHeight
+            });
+            
+            // Configuración para capturar
             const options = {
-                backgroundColor: '#F9FAFB', // Fondo claro igual al de la página
-                scale: 2, // Alta calidad
-                x: rect.left - 30, // Margen izquierdo
-                y: rect.top + window.scrollY - 50, // Margen superior
-                width: rect.width + 60, // Ancho + márgenes horizontales (30px cada lado)
-                height: rect.height + 100, // Alto + márgenes verticales (50px cada lado)
-                logging: false,
-                useCORS: true, // Para cargar imágenes externas
-                allowTaint: true
+                backgroundColor: '#F9FAFB',
+                scale: 2,
+                logging: true,
+                useCORS: true,
+                allowTaint: true,
+                width: wrapper.offsetWidth,
+                height: wrapper.offsetHeight,
+                windowWidth: wrapper.offsetWidth,
+                windowHeight: wrapper.offsetHeight
             };
 
+            console.log('⚙️ Opciones html2canvas:', options);
+
             // Capturar el canvas
-            const canvas = await html2canvas.default(cardElement, options);
+            const canvas = await html2canvas.default(wrapper, options);
+            
+            console.log('✅ Canvas creado:', {
+                width: canvas.width,
+                height: canvas.height
+            });
+            
+            // Remover el wrapper temporal
+            document.body.removeChild(wrapper);
             
             // Convertir canvas a Blob
             return new Promise((resolve, reject) => {
                 canvas.toBlob((blob) => {
                     if (blob) {
+                        console.log('✅ Blob creado, tamaño:', blob.size);
                         resolve(blob);
                     } else {
                         reject(new Error('Error al crear el blob de la imagen'));
@@ -69,7 +98,7 @@ export class ShareHelper {
                 }, 'image/png');
             });
         } catch (error) {
-            console.error('Error al capturar screenshot:', error);
+            console.error('❌ Error al capturar screenshot:', error);
             throw error;
         }
     }
