@@ -105,9 +105,9 @@ export class ShareHelper {
                     135deg,
                     #E9D5FF 0%,
                     #DDD6FE 15%,
-                    #C084FC 30%,
-                    #F0ABFC 40%,
-                    #FB923C 40%,
+                    #c08af7ff 30%,
+                    #f1b2fcff 40%,
+                    #f7a562ff 40%,
                     #FECACA 65%,
                     #FED7AA 60%
                 );
