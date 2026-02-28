@@ -101,7 +101,7 @@ export class ShareHelper {
                 top: -9999px;
                 left: -9999px;
                 padding: 50px 30px;
-                background: linear-gradient(135deg, #F5F3FF 0%, #FEFBFF 100%);
+                background-color: #F9FAFB;
                 display: inline-block;
             `;
             
@@ -144,43 +144,6 @@ export class ShareHelper {
                 console.log('Boton removido del clon');
             }
             
-            // Forzar estilos de categoría para centrado vertical
-            const clonedCategory = cardClone.querySelector('.product-card__category');
-            if (clonedCategory) {
-                // Guardar el texto
-                const categoryText = clonedCategory.textContent;
-                
-                // Aplicar estilos con centrado perfecto
-                clonedCategory.style.cssText = `
-                    position: absolute !important;
-                    top: 16px !important;
-                    left: 16px !important;
-                    background: rgba(255, 255, 255, 0.95) !important;
-                    backdrop-filter: blur(10px) !important;
-                    padding: 0 !important;
-                    border-radius: 999px !important;
-                    font-size: 14px !important;
-                    font-weight: 600 !important;
-                    color: #7C3AED !important;
-                    text-transform: uppercase !important;
-                    letter-spacing: 0.5px !important;
-                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    height: 32px !important;
-                    line-height: 32px !important;
-                    padding-left: 16px !important;
-                    padding-right: 16px !important;
-                `;
-                
-                console.log('Categoría con centrado forzado y altura fija');
-            }
-            
-            // Forzar box-shadow en la card para que html2canvas la capture
-            cardClone.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08)';
-            console.log('Box-shadow forzado en card clonada');
-            
             wrapper.appendChild(cardClone);
             document.body.appendChild(wrapper);
             console.log('📦 Wrapper y clon agregados al DOM');
@@ -197,7 +160,7 @@ export class ShareHelper {
             // Capturar con html2canvas
             console.log('INICIANDO CAPTURA...');
             const canvas = await html2canvas(wrapper, {
-                backgroundColor: '#F5F3FF',
+                backgroundColor: '#F9FAFB',
                 scale: 2,
                 useCORS: false,
                 allowTaint: true,
