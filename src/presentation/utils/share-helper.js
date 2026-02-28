@@ -101,7 +101,16 @@ export class ShareHelper {
                 top: -9999px;
                 left: -9999px;
                 padding: 50px 30px;
-                background-color: #F9FAFB;
+                background: linear-gradient(
+                    135deg,
+                    #E9D5FF 0%,
+                    #DDD6FE 15%,
+                    #C084FC 30%,
+                    #F0ABFC 50%,
+                    #FB923C 70%,
+                    #FECACA 85%,
+                    #FED7AA 100%
+                );
                 display: inline-block;
             `;
             
@@ -144,6 +153,13 @@ export class ShareHelper {
                 console.log('Boton removido del clon');
             }
             
+            // Remover categoría del clon
+            const clonedCategory = cardClone.querySelector('.product-card__category');
+            if (clonedCategory) {
+                clonedCategory.remove();
+                console.log('Categoría removida del clon');
+            }
+            
             wrapper.appendChild(cardClone);
             document.body.appendChild(wrapper);
             console.log('📦 Wrapper y clon agregados al DOM');
@@ -160,7 +176,7 @@ export class ShareHelper {
             // Capturar con html2canvas
             console.log('INICIANDO CAPTURA...');
             const canvas = await html2canvas(wrapper, {
-                backgroundColor: '#F9FAFB',
+                backgroundColor: '#E9D5FF',
                 scale: 2,
                 useCORS: false,
                 allowTaint: true,
