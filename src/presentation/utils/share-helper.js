@@ -35,163 +35,155 @@ export class ShareHelper {
      * @returns {Promise<Blob>} - Imagen capturada como Blob
      */
     static async captureCard(cardElement) {
+        let button = null;
+        let originalButtonDisplay = '';
+        
         try {
-            // Importar html2canvas dinámicamente
-            const html2canvas = await import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/+esm');
-            
-            console.log('📦 html2canvas cargado');
-            console.log('📍 Card original:', cardElement);
+            console.log('� Iniciando proceso de captura...');
+            console.log('📍 Card element:', cardElement);
             
             // Ocultar el botón antes de capturar
-            const button = cardElement.querySelector('.product-card__button');
-            const originalButtonDisplay = button ? button.style.display : '';
+            button = cardElement.querySelector('.product-card__button');
+            originalButtonDisplay = button ? button.style.display : '';
             if (button) {
                 button.style.display = 'none';
-                console.log('🙈 Botón oculto');
+                console.log('🙈 Botón ocultado');
             }
             
-            // Scroll al elemento para asegurarse de que esté visible
-            cardElement.scrollIntoView({ behavior: 'instant', block: 'center' });
-            await new Promise(resolve => setTimeout(resolve, 300));
+            // Crear un contenedor wrapper con padding
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = `
+                padding: 50px 30px;
+                background-color: #F9FAFB;
+                display: inline-block;
+                position: fixed;
+                top: -9999px;
+                left: -9999px;
+            `;
             
-            // Precargar todas las imágenes antes de capturar
-            const images = cardElement.querySelectorAll('img');
-            console.log('🖼️ Precargando imágenes:', images.length);
+            // Clonar la card
+            const clone = cardElement.cloneNode(true);
             
-            await Promise.all(Array.from(images).map(img => {
-                return new Promise((resolve) => {
-                    if (img.complete) {
-                        console.log('✅ Imagen ya cargada:', img.src);
-                        resolve();
-                    } else {
-                        img.onload = () => {
-                            console.log('✅ Imagen cargada:', img.src);
-                            resolve();
-                        };
-                        img.onerror = () => {
-                            console.log('❌ Error al cargar imagen:', img.src);
-                            resolve(); // Continuar aunque falle
-                        };
-                    }
-                });
-            }));
+            // Remover el botón del clon también
+            const cloneButton = clone.querySelector('.product-card__button');
+            if (cloneButton) {
+                cloneButton.remove();
+            }
             
-            // Configuración para capturar
+            // Obtener la imagen del producto
+            const originalImg = cardElement.querySelector('.product-card__image');
+            const cloneImg = clone.querySelector('.product-card__image');
+            
+            console.log('🖼️ Imagen original:', {
+                src: originalImg?.src,
+                complete: originalImg?.complete,
+                naturalWidth: originalImg?.naturalWidth,
+                naturalHeight: originalImg?.naturalHeight
+            });
+            
+            // Convertir imagen a data URL para evitar CORS
+            if (originalImg && originalImg.complete) {
+                try {
+                    console.log('🔄 Convirtiendo imagen a data URL...');
+                    const dataUrl = await this.imageToDataURL(originalImg);
+                    cloneImg.src = dataUrl;
+                    console.log('✅ Imagen convertida a data URL');
+                } catch (err) {
+                    console.warn('⚠️ No se pudo convertir imagen a data URL:', err);
+                }
+            }
+            
+            wrapper.appendChild(clone);
+            document.body.appendChild(wrapper);
+            
+            // Esperar un momento para que se renderice
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            console.log('📐 Dimensiones wrapper:', {
+                width: wrapper.offsetWidth,
+                height: wrapper.offsetHeight
+            });
+            
+            // Importar html2canvas
+            console.log('📦 Cargando html2canvas...');
+            const html2canvas = await import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/+esm');
+            console.log('✅ html2canvas cargado');
+            
+            // Capturar
             const options = {
                 backgroundColor: '#F9FAFB',
                 scale: 2,
-                logging: true,
+                logging: false,
                 useCORS: false,
                 allowTaint: true,
-                foreignObjectRendering: false,
-                imageTimeout: 15000,
-                proxy: undefined,
-                onclone: (clonedDoc, clonedElement) => {
-                    console.log('🔄 Clonando documento...');
-                    // Agregar padding al elemento clonado
-                    clonedElement.style.padding = '50px 30px';
-                    clonedElement.style.backgroundColor = '#F9FAFB';
-                    
-                    // Asegurar que el botón esté oculto en el clon también
-                    const clonedButton = clonedElement.querySelector('.product-card__button');
-                    if (clonedButton) {
-                        clonedButton.style.display = 'none';
-                    }
-                    
-                    // Forzar que las imágenes se muestren correctamente
-                    const clonedImages = clonedElement.querySelectorAll('img');
-                    console.log('🖼️ Imágenes en clon:', clonedImages.length);
-                    clonedImages.forEach((img, index) => {
-                        console.log(`Imagen ${index}:`, img.src, 'complete:', img.complete);
-                        
-                        // Forzar estilos para que la imagen sea visible
-                        img.style.display = 'block';
-                        img.style.opacity = '1';
-                        img.style.visibility = 'visible';
-                        img.style.position = 'absolute';
-                        img.style.top = '0';
-                        img.style.left = '0';
-                        img.style.width = '100%';
-                        img.style.height = '100%';
-                        img.style.objectFit = 'cover';
-                        
-                        // Remover cualquier transformación
-                        img.style.transform = 'none';
-                        
-                        // Asegurar que mantenga su src
-                        if (img.src) {
-                            const src = img.src;
-                            img.removeAttribute('crossorigin');
-                            img.setAttribute('src', src);
-                        }
-                    });
-                    
-                    // Asegurar que el contenedor de la imagen también esté correcto
-                    const imageContainers = clonedElement.querySelectorAll('.product-card__image-container');
-                    imageContainers.forEach(container => {
-                        container.style.position = 'relative';
-                        container.style.overflow = 'visible';
-                        container.style.background = '#F9FAFB';
-                    });
-                }
+                width: wrapper.offsetWidth,
+                height: wrapper.offsetHeight
             };
-
-            console.log('⚙️ Opciones html2canvas:', options);
-            console.log('📸 Iniciando captura...');
-
-            // Capturar el canvas
-            const canvas = await html2canvas.default(cardElement, options);
+            
+            console.log('📸 Capturando con opciones:', options);
+            const canvas = await html2canvas.default(wrapper, options);
             
             console.log('✅ Canvas creado:', {
                 width: canvas.width,
-                height: canvas.height,
-                hasData: canvas.toDataURL().length > 100
+                height: canvas.height
             });
             
-            // Restaurar el botón
+            // Limpiar
+            document.body.removeChild(wrapper);
+            
+            // Restaurar botón
             if (button) {
                 button.style.display = originalButtonDisplay;
                 console.log('👁️ Botón restaurado');
             }
             
-            // Verificar que el canvas no esté vacío
-            const ctx = canvas.getContext('2d');
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-            let hasContent = false;
-            for (let i = 0; i < data.length; i += 4) {
-                if (data[i] !== 0 || data[i+1] !== 0 || data[i+2] !== 0) {
-                    hasContent = true;
-                    break;
-                }
-            }
-            
-            console.log('🎨 Canvas tiene contenido:', hasContent);
-            
-            if (!hasContent) {
-                throw new Error('El canvas capturado está vacío');
-            }
-            
-            // Convertir canvas a Blob
+            // Convertir a blob
             return new Promise((resolve, reject) => {
                 canvas.toBlob((blob) => {
-                    if (blob && blob.size > 1000) { // Al menos 1KB
-                        console.log('✅ Blob creado, tamaño:', blob.size);
+                    if (blob && blob.size > 1000) {
+                        console.log('✅ Blob creado, tamaño:', blob.size, 'bytes');
                         resolve(blob);
                     } else {
-                        reject(new Error('Blob inválido o muy pequeño'));
+                        console.error('❌ Blob inválido o muy pequeño');
+                        reject(new Error('Error al crear el blob de la imagen'));
                     }
-                }, 'image/png', 1.0);
+                }, 'image/png', 0.95);
             });
+            
         } catch (error) {
-            console.error('❌ Error al capturar screenshot:', error);
-            // Restaurar el botón en caso de error
-            const button = cardElement.querySelector('.product-card__button');
+            console.error('❌ ERROR COMPLETO:', error);
+            console.error('❌ Stack:', error.stack);
+            
+            // Restaurar botón en caso de error
             if (button) {
-                button.style.display = '';
+                button.style.display = originalButtonDisplay;
             }
+            
             throw error;
         }
+    }
+    
+    /**
+     * Convierte una imagen a Data URL para evitar problemas CORS
+     * @param {HTMLImageElement} img - Imagen a convertir
+     * @returns {Promise<string>} - Data URL de la imagen
+     */
+    static async imageToDataURL(img) {
+        return new Promise((resolve, reject) => {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                const dataURL = canvas.toDataURL('image/png');
+                resolve(dataURL);
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 
     /**
