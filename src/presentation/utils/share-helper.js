@@ -147,26 +147,6 @@ export class ShareHelper {
                 clonedCategory.remove();
             }
             
-            // Aumentar tamaño de fuentes para mejor legibilidad en estados de WhatsApp
-            const clonedTitle = cardClone.querySelector('.product-card__title');
-            if (clonedTitle) {
-                clonedTitle.style.fontSize = '24px';
-                clonedTitle.style.fontWeight = '700';
-                clonedTitle.style.lineHeight = '1.3';
-            }
-            
-            const clonedDescription = cardClone.querySelector('.product-card__description');
-            if (clonedDescription) {
-                clonedDescription.style.fontSize = '18px';
-                clonedDescription.style.lineHeight = '1.5';
-            }
-            
-            const clonedPrice = cardClone.querySelector('.product-card__price');
-            if (clonedPrice) {
-                clonedPrice.style.fontSize = '28px';
-                clonedPrice.style.fontWeight = '800';
-            }
-            
             wrapper.appendChild(cardClone);
             document.body.appendChild(wrapper);
             
@@ -179,7 +159,7 @@ export class ShareHelper {
             // Capturar con html2canvas
             const canvas = await html2canvas(wrapper, {
                 backgroundColor: '#E9D5FF',
-                scale: 3,
+                scale: 2,
                 useCORS: false,
                 allowTaint: true,
                 logging: false
@@ -223,8 +203,9 @@ export class ShareHelper {
      * Comparte la imagen usando la Web Share API
      * @param {Blob} imageBlob - Imagen a compartir
      * @param {string} productTitle - Título del producto para el texto compartido
+     * @param {string} productDescription - Descripción del producto
      */
-    static async shareImage(imageBlob, productTitle) {
+    static async shareImage(imageBlob, productTitle, productDescription) {
         try {
             // Verificar si la Web Share API está disponible
             if (!navigator.share) {
@@ -239,11 +220,14 @@ export class ShareHelper {
                 throw new Error('No se pueden compartir archivos en este dispositivo');
             }
 
+            // Crear texto con formato: título - descripción - URL
+            const shareText = `${productTitle} - ${productDescription} - www.gangastyle.com.ar`;
+
             // Compartir
             await navigator.share({
                 files: [file],
                 title: 'Ganga Style',
-                text: 'Mirá mas de mis productos en www.vivastorear.com'
+                text: shareText
             });
 
         } catch (error) {
@@ -277,8 +261,9 @@ export class ShareHelper {
      * @param {Event} event - Evento del click
      * @param {HTMLElement} cardElement - Elemento de la card
      * @param {string} productTitle - Título del producto
+     * @param {string} productDescription - Descripción del producto
      */
-    static async handleShareClick(event, cardElement, productTitle) {
+    static async handleShareClick(event, cardElement, productTitle, productDescription) {
         // Prevenir cualquier comportamiento por defecto
         if (event) {
             event.preventDefault();
@@ -304,7 +289,7 @@ export class ShareHelper {
             button.innerHTML = '<span>Compartiendo...</span>';
 
             // Compartir imagen
-            await this.shareImage(imageBlob, productTitle);
+            await this.shareImage(imageBlob, productTitle, productDescription);
 
             // Restaurar botón
             button.innerHTML = originalText;

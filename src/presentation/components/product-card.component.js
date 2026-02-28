@@ -67,7 +67,8 @@ export class ProductCardComponent {
                     const handled = await ShareHelper.handleShareClick(
                         event,
                         card,
-                        this.product.title
+                        this.product.title,
+                        this.product.description
                     );
                     return; // No continuar con WhatsApp
                 } else {
