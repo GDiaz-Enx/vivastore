@@ -235,8 +235,22 @@ export class ShareHelper {
             button.disabled = false;
             button.style.opacity = '1';
             
-            // Mostrar error amigable
-            alert('Error al capturar o compartir la imagen. Por favor, intenta de nuevo.');
+            // Crear mensaje de error detallado
+            const errorDetails = `
+ERROR DE CAPTURA
+-----------------
+Tipo: ${error.name || 'Unknown'}
+Mensaje: ${error.message || 'Sin mensaje'}
+Stack: ${error.stack ? error.stack.substring(0, 200) : 'No disponible'}
+Navegador: ${navigator.userAgent}
+Tamaño viewport: ${window.innerWidth}x${window.innerHeight}
+            `.trim();
+            
+            console.error('DETALLES DEL ERROR:', errorDetails);
+            
+            // Mostrar error con opción de copiar
+            const userMessage = `Error al capturar o compartir la imagen.\n\n${errorDetails}\n\nPor favor, copia este mensaje y compártelo con el desarrollador.`;
+            alert(userMessage);
             
             return false;
         }
