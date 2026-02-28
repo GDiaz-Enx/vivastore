@@ -52,6 +52,16 @@ export class ShareHelper {
             
             // Clonar la card
             const cardClone = cardElement.cloneNode(true);
+            
+            // Asegurarse de que las imágenes estén cargadas en el clon
+            const images = cardClone.querySelectorAll('img');
+            images.forEach(img => {
+                // Forzar que la imagen se muestre con su src actual
+                const src = img.src;
+                img.src = src;
+                img.style.display = 'block';
+            });
+            
             wrapper.appendChild(cardClone);
             document.body.appendChild(wrapper);
             
@@ -60,6 +70,9 @@ export class ShareHelper {
                 height: wrapper.offsetHeight
             });
             
+            // Esperar un momento para que las imágenes se carguen
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
             // Configuración para capturar
             const options = {
                 backgroundColor: '#F9FAFB',
@@ -67,10 +80,13 @@ export class ShareHelper {
                 logging: true,
                 useCORS: true,
                 allowTaint: true,
+                foreignObjectRendering: true,
                 width: wrapper.offsetWidth,
                 height: wrapper.offsetHeight,
                 windowWidth: wrapper.offsetWidth,
-                windowHeight: wrapper.offsetHeight
+                windowHeight: wrapper.offsetHeight,
+                imageTimeout: 0,
+                removeContainer: false
             };
 
             console.log('⚙️ Opciones html2canvas:', options);
@@ -95,7 +111,7 @@ export class ShareHelper {
                     } else {
                         reject(new Error('Error al crear el blob de la imagen'));
                     }
-                }, 'image/png');
+                }, 'image/png', 1.0);
             });
         } catch (error) {
             console.error('❌ Error al capturar screenshot:', error);
@@ -172,17 +188,26 @@ export class ShareHelper {
             event.stopImmediatePropagation();
         }
 
+        const button = event.currentTarget;
+        const originalText = button.innerHTML;
+
         try {
-            // Mostrar indicador de carga
-            const button = event.currentTarget;
-            const originalText = button.innerHTML;
-            button.innerHTML = '<span>Capturando...</span>';
+            // Deshabilitar botón temporalmente sin cambiar el texto
             button.disabled = true;
+            button.style.opacity = '0.6';
+            
+            console.log('📸 Iniciando captura en 100ms...');
+            
+            // Pequeña pausa para que el botón se vea normal antes de capturar
+            await new Promise(resolve => setTimeout(resolve, 100));
 
             // Capturar screenshot
             console.log('📸 Capturando card...');
             const imageBlob = await this.captureCard(cardElement);
             console.log('✅ Card capturada, tamaño:', imageBlob.size);
+
+            // Mostrar indicador de que se está compartiendo
+            button.innerHTML = '<span>Compartiendo...</span>';
 
             // Compartir imagen
             console.log('📤 Compartiendo imagen...');
@@ -192,20 +217,19 @@ export class ShareHelper {
             // Restaurar botón
             button.innerHTML = originalText;
             button.disabled = false;
+            button.style.opacity = '1';
             
             return true; // Éxito
         } catch (error) {
             console.error('❌ Error en handleShareClick:', error);
-            alert('Error al capturar o compartir la imagen. Por favor, intenta de nuevo.');
             
             // Restaurar botón
-            const button = event.currentTarget;
-            const originalText = button.textContent;
-            button.innerHTML = `<svg class="product-card__button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="currentColor"/>
-                        </svg>
-                        Consultar`;
+            button.innerHTML = originalText;
             button.disabled = false;
+            button.style.opacity = '1';
+            
+            // Mostrar error amigable
+            alert('Error al capturar o compartir la imagen. Por favor, intenta de nuevo.');
             
             return false;
         }
