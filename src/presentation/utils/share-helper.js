@@ -37,6 +37,7 @@ export class ShareHelper {
     static async captureCard(cardElement) {
         let button = null;
         let originalButtonDisplay = '';
+        let wrapper = null;
         
         try {
             console.log('� Iniciando proceso de captura...');
@@ -51,7 +52,7 @@ export class ShareHelper {
             }
             
             // Crear wrapper temporal FUERA del viewport con un CLON
-            const wrapper = document.createElement('div');
+            wrapper = document.createElement('div');
             wrapper.style.cssText = `
                 position: fixed;
                 top: -9999px;
