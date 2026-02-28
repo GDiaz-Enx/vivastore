@@ -330,6 +330,10 @@
         gap: var(--spacing-md);
     }
     
+    .search-container {
+        width: 100%;
+    }
+    
     .category-filter {
         flex-direction: row;
         align-items: center;
