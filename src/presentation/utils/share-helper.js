@@ -101,7 +101,7 @@ export class ShareHelper {
                 top: -9999px;
                 left: -9999px;
                 padding: 50px 30px;
-                background-color: #F9FAFB;
+                background: linear-gradient(135deg, #E9D5FF 0%, #F3E8FF 100%);
                 display: inline-block;
             `;
             
@@ -144,6 +144,21 @@ export class ShareHelper {
                 console.log('Boton removido del clon');
             }
             
+            // Forzar estilos de categoría para centrado vertical
+            const clonedCategory = cardClone.querySelector('.product-card__category');
+            if (clonedCategory) {
+                clonedCategory.style.display = 'flex';
+                clonedCategory.style.alignItems = 'center';
+                clonedCategory.style.justifyContent = 'center';
+                clonedCategory.style.padding = '8px 16px';
+                clonedCategory.style.lineHeight = '1';
+                console.log('Categoría con centrado forzado');
+            }
+            
+            // Forzar box-shadow en la card para que html2canvas la capture
+            cardClone.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08)';
+            console.log('Box-shadow forzado en card clonada');
+            
             wrapper.appendChild(cardClone);
             document.body.appendChild(wrapper);
             console.log('📦 Wrapper y clon agregados al DOM');
@@ -160,7 +175,7 @@ export class ShareHelper {
             // Capturar con html2canvas
             console.log('INICIANDO CAPTURA...');
             const canvas = await html2canvas(wrapper, {
-                backgroundColor: '#F9FAFB',
+                backgroundColor: '#E9D5FF',
                 scale: 2,
                 useCORS: false,
                 allowTaint: true,
