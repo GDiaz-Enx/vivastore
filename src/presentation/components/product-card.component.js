@@ -3,6 +3,8 @@
  * Componente para renderizar una tarjeta de producto
  */
 
+import { ShareHelper } from '../utils/share-helper.js';
+
 export class ProductCardComponent {
     constructor(product) {
         this.product = product;
@@ -15,6 +17,7 @@ export class ProductCardComponent {
         const card = document.createElement('article');
         card.className = 'product-card';
         card.setAttribute('data-category', this.product.category);
+        card.setAttribute('data-product-id', this.product.id);
 
         card.innerHTML = `
             <div class="product-card__image-container">
@@ -39,7 +42,7 @@ export class ProductCardComponent {
                     <span class="product-card__price">${this.product.getFormattedPrice()}</span>
                     <button 
                         class="product-card__button"
-                        onclick="window.open('${this.product.getWhatsAppMessage('5491154913309')}', '_blank')"
+                        data-product-title="${this.product.title}"
                         aria-label="Consultar por ${this.product.title}"
                     >
                         <svg class="product-card__button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -50,6 +53,23 @@ export class ProductCardComponent {
                 </div>
             </div>
         `;
+
+        // Configurar evento del botón
+        const button = card.querySelector('.product-card__button');
+        button.addEventListener('click', async (event) => {
+            // Si es modo share y móvil, capturar y compartir
+            if (ShareHelper.isMobile() && ShareHelper.isShareMode()) {
+                const handled = await ShareHelper.handleShareClick(
+                    event,
+                    card,
+                    this.product.title
+                );
+                if (handled) return; // No continuar con WhatsApp
+            }
+            
+            // Comportamiento normal: abrir WhatsApp
+            window.open(this.product.getWhatsAppMessage('5491154913309'), '_blank');
+        });
 
         // Agregar animación de entrada
         card.style.opacity = '0';

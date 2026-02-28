@@ -1,6 +1,7 @@
 import { ProductService } from '../application/services/product.service.js';
 import { ProductGridComponent } from './components/product-grid.component.js';
 import { HeaderComponent } from './components/header.component.js';
+import { ShareHelper } from './utils/share-helper.js';
 
 /**
  * Main Application
@@ -21,6 +22,9 @@ class App {
     async init() {
         try {
             console.log('🚀 Inicializando Viva Store...');
+            
+            // Mostrar banner si está en modo share y es móvil
+            this.showShareBannerIfNeeded();
             
             this.productGrid.showLoading();
             
@@ -45,6 +49,29 @@ class App {
             console.error('❌ Error fatal:', error);
             this.productGrid.hideLoading();
             this.productGrid.showError('Error al inicializar la aplicación');
+        }
+    }
+
+    /**
+     * Muestra un banner informativo si está en modo share en móvil
+     */
+    showShareBannerIfNeeded() {
+        if (ShareHelper.isShareMode() && ShareHelper.isMobile()) {
+            const heroSection = document.querySelector('.hero');
+            if (heroSection) {
+                const banner = document.createElement('div');
+                banner.className = 'share-mode-banner';
+                banner.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" fill="currentColor"/>
+                    </svg>
+                    <div>
+                        <strong>Modo Compartir Activado</strong>
+                        <p>Toca "Consultar" en cualquier producto para capturar y compartir</p>
+                    </div>
+                `;
+                heroSection.appendChild(banner);
+            }
         }
     }
 

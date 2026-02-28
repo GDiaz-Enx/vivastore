@@ -9,8 +9,39 @@ Catálogo de productos minimalista con integración a Google Sheets. Sin checkou
 - 🎨 Header con gradient animado en tonos lilas y salmon
 - 📊 Integración con Google Sheets para gestión de productos
 - 💬 Contacto directo por WhatsApp
+- 📸 **Modo Share**: Captura y comparte productos en redes sociales
 - 🏗️ Arquitectura Clean
 - 🚫 Sin dependencias externas (Vanilla JS)
+
+## 📸 Modo Share
+
+### ¿Cómo funciona?
+
+Accede a tu sitio con la ruta `/share` desde un dispositivo móvil para activar el modo compartir:
+
+```
+https://tuweb.com/share
+```
+
+**En modo share:**
+1. Navega por el catálogo normalmente
+2. Toca el botón "Consultar" en cualquier producto
+3. El sistema capturará automáticamente una imagen del producto
+4. Se abrirá el menú nativo de compartir de tu teléfono
+5. ¡Comparte directamente en WhatsApp, Instagram, Facebook o como estado de WhatsApp!
+
+**Características técnicas:**
+- ✅ Solo funciona en dispositivos móviles
+- ✅ Captura con márgenes (30px horizontal, 50px vertical)
+- ✅ Alta calidad (2x scale)
+- ✅ Usa la Web Share API nativa
+- ✅ Fallback a descarga si no se puede compartir
+
+### Ejemplo de uso:
+```
+www.vivastorear.com/share  ← Modo normal + función compartir
+www.vivastorear.com        ← Modo normal (WhatsApp directo)
+```
 
 ## 📁 Estructura del Proyecto
 
