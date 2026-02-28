@@ -82,12 +82,13 @@ export class ShareHelper {
             console.log('✅ dom-to-image cargado');
             
             // Capturar
-            console.log('📸 Capturando con opciones...');
+            console.log('INICIANDO CAPTURA toBlob...');
             const blob = await domtoimage.default.toBlob(wrapper, {
                 quality: 0.95,
                 bgcolor: '#F9FAFB',
                 cacheBust: false
             });
+            console.log('BLOB GENERADO:', blob, 'SIZE:', blob ? blob.size : 'null');
             
             // Limpiar wrapper temporal
             document.body.removeChild(wrapper);
@@ -102,10 +103,21 @@ export class ShareHelper {
             return blob;
             
         } catch (error) {
-            console.error('❌ ERROR COMPLETO:', error);
-            console.error('❌ Stack:', error.stack);
+            console.error('!!!!! ERROR EN CAPTURA:', error);
+            console.error('!!!!! Error type:', typeof error);
+            console.error('!!!!! Error message:', error.message);
+            console.error('!!!!! Error stack:', error.stack);
+            console.error('!!!!! Error toString:', error.toString());
             
-            // Restaurar botón en caso de error
+            // Limpiar wrapper si existe
+            if (wrapper && wrapper.parentNode) {
+                try {
+                    document.body.removeChild(wrapper);
+                    console.log('Wrapper limpiado despues de error');
+                } catch (cleanupError) {
+                    console.error('Error limpiando wrapper:', cleanupError);
+                }
+            }
             if (button) {
                 button.style.display = originalButtonDisplay;
             }
