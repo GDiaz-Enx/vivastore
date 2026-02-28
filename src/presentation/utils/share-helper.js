@@ -101,7 +101,7 @@ export class ShareHelper {
                 top: -9999px;
                 left: -9999px;
                 padding: 50px 30px;
-                background: linear-gradient(135deg, #E9D5FF 0%, #F3E8FF 100%);
+                background: linear-gradient(135deg, #F5F3FF 0%, #FEFBFF 100%);
                 display: inline-block;
             `;
             
@@ -147,17 +147,34 @@ export class ShareHelper {
             // Forzar estilos de categoría para centrado vertical
             const clonedCategory = cardClone.querySelector('.product-card__category');
             if (clonedCategory) {
+                // Guardar el texto
+                const categoryText = clonedCategory.textContent;
+                
+                // Aplicar estilos con centrado perfecto
                 clonedCategory.style.cssText = `
-                    display: inline-flex !important;
+                    position: absolute !important;
+                    top: 16px !important;
+                    left: 16px !important;
+                    background: rgba(255, 255, 255, 0.95) !important;
+                    backdrop-filter: blur(10px) !important;
+                    padding: 0 !important;
+                    border-radius: 999px !important;
+                    font-size: 14px !important;
+                    font-weight: 600 !important;
+                    color: #7C3AED !important;
+                    text-transform: uppercase !important;
+                    letter-spacing: 0.5px !important;
+                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+                    display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
-                    padding: 8px 16px !important;
-                    line-height: 1 !important;
-                    height: auto !important;
-                    min-height: 32px !important;
-                    vertical-align: middle !important;
+                    height: 32px !important;
+                    line-height: 32px !important;
+                    padding-left: 16px !important;
+                    padding-right: 16px !important;
                 `;
-                console.log('Categoría con centrado forzado');
+                
+                console.log('Categoría con centrado forzado y altura fija');
             }
             
             // Forzar box-shadow en la card para que html2canvas la capture
@@ -180,7 +197,7 @@ export class ShareHelper {
             // Capturar con html2canvas
             console.log('INICIANDO CAPTURA...');
             const canvas = await html2canvas(wrapper, {
-                backgroundColor: '#f9f6fdff',
+                backgroundColor: '#F5F3FF',
                 scale: 2,
                 useCORS: false,
                 allowTaint: true,
