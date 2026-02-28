@@ -147,11 +147,16 @@ export class ShareHelper {
             // Forzar estilos de categoría para centrado vertical
             const clonedCategory = cardClone.querySelector('.product-card__category');
             if (clonedCategory) {
-                clonedCategory.style.display = 'flex';
-                clonedCategory.style.alignItems = 'center';
-                clonedCategory.style.justifyContent = 'center';
-                clonedCategory.style.padding = '8px 16px';
-                clonedCategory.style.lineHeight = '1';
+                clonedCategory.style.cssText = `
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    padding: 8px 16px !important;
+                    line-height: 1 !important;
+                    height: auto !important;
+                    min-height: 32px !important;
+                    vertical-align: middle !important;
+                `;
                 console.log('Categoría con centrado forzado');
             }
             
@@ -175,7 +180,7 @@ export class ShareHelper {
             // Capturar con html2canvas
             console.log('INICIANDO CAPTURA...');
             const canvas = await html2canvas(wrapper, {
-                backgroundColor: '#E9D5FF',
+                backgroundColor: '#f9f6fdff',
                 scale: 2,
                 useCORS: false,
                 allowTaint: true,
