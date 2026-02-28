@@ -3,6 +3,11 @@
  * Normalización y reset de estilos base
  */
 
+/* Force light theme */
+:root {
+    color-scheme: light only;
+}
+
 /* Box sizing */
 *,
 *::before,
@@ -10,6 +15,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    color-scheme: light only;
 }
 
 /* Document */
@@ -18,6 +24,7 @@ html {
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
+    color-scheme: light only;
 }
 
 body {
@@ -27,6 +34,7 @@ body {
     color: var(--color-gray-900);
     background-color: var(--color-gray-50);
     min-height: 100vh;
+    color-scheme: light only;
 }
 
 /* Typography */
