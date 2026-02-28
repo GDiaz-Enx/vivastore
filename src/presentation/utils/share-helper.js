@@ -50,105 +50,38 @@ export class ShareHelper {
                 console.log('🙈 Botón ocultado');
             }
             
-            // Crear un contenedor wrapper con padding
+            // Crear wrapper temporal con padding alrededor de la card
+            const originalParent = cardElement.parentNode;
             const wrapper = document.createElement('div');
-            wrapper.style.cssText = `
-                padding: 50px 30px;
-                background-color: #F9FAFB;
-                display: inline-block;
-                position: fixed;
-                top: -9999px;
-                left: -9999px;
-            `;
+            wrapper.style.cssText = 'padding: 50px 30px; background-color: #F9FAFB; display: inline-block;';
+            originalParent.insertBefore(wrapper, cardElement);
+            wrapper.appendChild(cardElement);
             
-            // Clonar la card
-            const clone = cardElement.cloneNode(true);
-            
-            // Remover el botón del clon también
-            const cloneButton = clone.querySelector('.product-card__button');
-            if (cloneButton) {
-                cloneButton.remove();
-            }
-            
-            // Obtener la imagen del producto
-            const originalImg = cardElement.querySelector('.product-card__image');
-            const cloneImg = clone.querySelector('.product-card__image');
-            
-            console.log('🖼️ Imagen original:', {
-                src: originalImg?.src,
-                complete: originalImg?.complete,
-                naturalWidth: originalImg?.naturalWidth,
-                naturalHeight: originalImg?.naturalHeight
-            });
-            
-            // Convertir imagen a data URL para evitar CORS
-            if (originalImg && originalImg.complete) {
-                try {
-                    console.log('🔄 Convirtiendo imagen a data URL...');
-                    const dataUrl = await this.imageToDataURL(originalImg);
-                    cloneImg.src = dataUrl;
-                    console.log('✅ Imagen convertida a data URL');
-                } catch (err) {
-                    console.warn('⚠️ No se pudo convertir imagen a data URL:', err);
-                }
-            }
-            
-            wrapper.appendChild(clone);
-            document.body.appendChild(wrapper);
-            
-            // Esperar un momento para que se renderice
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
-            console.log('📐 Dimensiones wrapper:', {
-                width: wrapper.offsetWidth,
-                height: wrapper.offsetHeight
-            });
-            
-            // Importar html2canvas
-            console.log('📦 Cargando html2canvas...');
-            const html2canvas = await import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/+esm');
-            console.log('✅ html2canvas cargado');
+            // Importar dom-to-image-more
+            console.log('📦 Cargando dom-to-image...');
+            const domtoimage = await import('https://cdn.jsdelivr.net/npm/dom-to-image-more@3.0.3/+esm');
+            console.log('✅ dom-to-image cargado');
             
             // Capturar
-            const options = {
-                backgroundColor: '#F9FAFB',
-                scale: 2,
-                logging: false,
-                useCORS: false,
-                allowTaint: true,
-                width: wrapper.offsetWidth,
-                height: wrapper.offsetHeight
-            };
-            
-            console.log('📸 Capturando con opciones:', options);
-            const canvas = await html2canvas.default(wrapper, options);
-            
-            console.log('✅ Canvas creado:', {
-                width: canvas.width,
-                height: canvas.height
+            console.log('📸 Capturando con opciones...');
+            const blob = await domtoimage.default.toBlob(wrapper, {
+                quality: 0.95,
+                bgcolor: '#F9FAFB',
+                cacheBust: false
             });
             
-            // Limpiar
-            document.body.removeChild(wrapper);
+            // Restaurar estructura original
+            wrapper.parentNode.insertBefore(cardElement, wrapper);
+            wrapper.remove();
+            
+            console.log('✅ Captura exitosa, tamaño:', blob.size, 'bytes');
             
             // Restaurar botón
             if (button) {
                 button.style.display = originalButtonDisplay;
-                console.log('👁️ Botón restaurado');
             }
             
-            // Convertir a blob
-            return new Promise((resolve, reject) => {
-                canvas.toBlob((blob) => {
-                    if (blob && blob.size > 1000) {
-                        console.log('✅ Blob creado, tamaño:', blob.size, 'bytes');
-                        resolve(blob);
-                    } else {
-                        console.error('❌ Blob inválido o muy pequeño');
-                        reject(new Error('Error al crear el blob de la imagen'));
-                    }
-                }, 'image/png', 0.95);
-            });
+            return blob;
             
         } catch (error) {
             console.error('❌ ERROR COMPLETO:', error);
@@ -161,29 +94,6 @@ export class ShareHelper {
             
             throw error;
         }
-    }
-    
-    /**
-     * Convierte una imagen a Data URL para evitar problemas CORS
-     * @param {HTMLImageElement} img - Imagen a convertir
-     * @returns {Promise<string>} - Data URL de la imagen
-     */
-    static async imageToDataURL(img) {
-        return new Promise((resolve, reject) => {
-            try {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.naturalWidth;
-                canvas.height = img.naturalHeight;
-                
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                
-                const dataURL = canvas.toDataURL('image/png');
-                resolve(dataURL);
-            } catch (error) {
-                reject(error);
-            }
-        });
     }
 
     /**
