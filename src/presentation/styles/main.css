@@ -331,20 +331,19 @@
     }
     
     .category-filter {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
         gap: var(--spacing-sm);
         width: 100%;
     }
     
-    .category-filter__select {
-        width: 100%;
-        min-width: auto;
+    .category-filter__label {
+        flex-shrink: 0;
     }
     
     .category-filter__select {
-        width: 100%;
-        max-width: 100%;
+        flex: 1;
+        min-width: 0;
     }
     
     .category-filter__button {
