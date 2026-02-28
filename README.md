@@ -35,67 +35,6 @@ Viva Store/
     └── icons/
 ```
 
-## 🛠️ Configuración
-
-### 1. Google Sheets
-
-1. Crea un Google Sheet con las siguientes columnas:
-   - **Título** (A): Nombre del producto
-   - **Descripción** (B): Descripción opcional
-   - **Precio** (C): Precio numérico
-   - **Imagen URL** (D): URL de la imagen
-   - **Categoría** (E): Categoría del producto
-   - **ID** (F): Identificador único (opcional)
-
-2. Haz el sheet público:
-   - Archivo → Compartir → Obtener enlace
-   - Cambiar a "Cualquier persona con el enlace"
-
-3. Obtén el Sheet ID de la URL:
-   ```
-   https://docs.google.com/spreadsheets/d/[SHEET_ID]/edit
-   ```
-
-4. Crea una API Key en [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-
-5. Actualiza la configuración en `src/infrastructure/config/google-sheets.config.js`:
-   ```javascript
-   export const GOOGLE_SHEET_ID = 'tu-sheet-id';
-   export const GOOGLE_API_KEY = 'tu-api-key';
-   ```
-
-### 2. WhatsApp
-
-Actualiza el número de WhatsApp en:
-- `index.html` (línea 22)
-- `src/presentation/components/product-card.component.js` (línea 38)
-
-Reemplaza `5491154913309` con tu número (formato internacional sin + ni espacios).
-
-## 🚀 Ejecución
-
-### Opción 1: Directamente en el navegador
-```bash
-# Abre index.html con doble click
-```
-
-### Opción 2: Live Server (VS Code)
-```bash
-# Click derecho en index.html → Open with Live Server
-```
-
-### Opción 3: Servidor HTTP Python
-```bash
-python -m http.server 8000
-# Abre http://localhost:8000
-```
-
-### Opción 4: Servidor HTTP Node
-```bash
-npx http-server -p 8000
-# Abre http://localhost:8000
-```
-
 ## 🎨 Personalización
 
 ### Colores
@@ -105,15 +44,6 @@ Modifica las variables en `src/presentation/styles/variables.css`:
 --color-secondary: #FB923C;
 --color-accent: #F472B6;
 ```
-
-### Layout
-Ajusta el grid en `src/presentation/styles/main.css`:
-```css
-.product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-}
-```
-
 ## 🧪 Datos de Prueba
 
 El proyecto incluye datos mock que se cargan automáticamente si:
@@ -136,14 +66,6 @@ El proyecto sigue los principios de Clean Architecture:
 - **Application**: Orquestación de casos de uso
 - **Infrastructure**: Detalles de implementación (APIs, etc.)
 - **Presentation**: UI y componentes visuales
-
-## 🔧 Tecnologías
-
-- HTML5
-- CSS3 (Variables, Grid, Flexbox, Animations)
-- JavaScript ES6+ (Modules, Classes, Async/Await)
-- Google Sheets API v4
-- WhatsApp Web API
 
 ## 📄 Licencia
 
