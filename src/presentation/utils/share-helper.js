@@ -106,10 +106,10 @@ export class ShareHelper {
                     #E9D5FF 0%,
                     #DDD6FE 15%,
                     #C084FC 30%,
-                    #F0ABFC 50%,
-                    #FB923C 70%,
-                    #FECACA 85%,
-                    #FED7AA 100%
+                    #F0ABFC 40%,
+                    #FB923C 40%,
+                    #FECACA 65%,
+                    #FED7AA 60%
                 );
                 display: inline-block;
             `;
