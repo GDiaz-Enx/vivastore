@@ -62,18 +62,13 @@ export class ProductCardComponent {
                 event.preventDefault();
                 event.stopPropagation();
                 
-                console.log('🔍 Modo share detectado');
-                console.log('📱 Es móvil?', ShareHelper.isMobile());
-                
                 // Si es móvil, capturar y compartir
                 if (ShareHelper.isMobile()) {
-                    console.log('📸 Iniciando captura...');
                     const handled = await ShareHelper.handleShareClick(
                         event,
                         card,
                         this.product.title
                     );
-                    console.log('✅ Captura manejada:', handled);
                     return; // No continuar con WhatsApp
                 } else {
                     // En desktop en modo share, avisar que solo funciona en móvil

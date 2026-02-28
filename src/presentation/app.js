@@ -21,8 +21,6 @@ class App {
 
     async init() {
         try {
-            console.log('🚀 Inicializando Viva Store...');
-            
             // Mostrar banner si está en modo share y es móvil
             this.showShareBannerIfNeeded();
             
@@ -33,7 +31,6 @@ class App {
             this.productGrid.hideLoading();
             
             if (result.success) {
-                console.log(`✅ ${result.data.length} productos cargados`);
                 this.productGrid.setAllProducts(result.data);
                 this.productGrid.render(result.data);
                 
@@ -41,12 +38,10 @@ class App {
                 this.initializeCategoryFilter();
                 this.initializeSearch();
             } else {
-                console.error('❌ Error cargando productos:', result.error);
                 this.productGrid.showError(result.error);
             }
             
         } catch (error) {
-            console.error('❌ Error fatal:', error);
             this.productGrid.hideLoading();
             this.productGrid.showError('Error al inicializar la aplicación');
         }

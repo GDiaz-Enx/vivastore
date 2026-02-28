@@ -16,7 +16,6 @@ export class GetProductsUseCase {
                 error: null
             };
         } catch (error) {
-            console.error('Error en GetProductsUseCase:', error);
             return {
                 success: false,
                 data: [],

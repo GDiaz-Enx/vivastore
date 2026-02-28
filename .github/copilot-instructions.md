@@ -1,7 +1,7 @@
-# Copilot Instructions - Viva Store
+# Copilot Instructions - Ganga Style
 
 ## Project Overview
-Viva Store - Catálogo de productos minimalista que muestra productos desde Google Sheets. Sin checkout ni pagos, solo visualización y contacto por WhatsApp.
+Ganga Style - Catálogo de productos minimalista que muestra productos desde Google Sheets. Sin checkout ni pagos, solo visualización y contacto por WhatsApp.
 
 ## Architecture
 - **Frontend**: HTML5, CSS3, JavaScript ES6+ (Vanilla)

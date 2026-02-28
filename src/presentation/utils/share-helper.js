@@ -83,15 +83,11 @@ export class ShareHelper {
         let wrapper = null;
         
         try {
-            console.log('� Iniciando proceso de captura...');
-            console.log('📍 Card element:', cardElement);
-            
             // Ocultar el botón antes de capturar
             button = cardElement.querySelector('.product-card__button');
             originalButtonDisplay = button ? button.style.display : '';
             if (button) {
                 button.style.display = 'none';
-                console.log('🙈 Botón ocultado');
             }
             
             // Crear wrapper temporal FUERA del viewport con un CLON
@@ -116,32 +112,25 @@ export class ShareHelper {
             
             // CLONAR la card (no moverla!)
             const cardClone = cardElement.cloneNode(true);
-            console.log('Card clonada');
             
             // Convertir imágenes externas a Data URLs usando proxy CORS
             const images = cardClone.querySelectorAll('img');
-            console.log('Convirtiendo', images.length, 'imagenes a Data URL con proxy...');
             
             for (const img of images) {
                 try {
                     if (img.src && !img.src.startsWith('data:')) {
-                        console.log('Convirtiendo imagen:', img.src.substring(0, 50));
-                        
                         // Usar proxy CORS para cargar la imagen
                         const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(img.src)}`;
                         const dataUrl = await this.fetchImageAsDataURL(proxyUrl);
                         img.src = dataUrl;
-                        
-                        console.log('Imagen convertida OK');
                     }
                 } catch (err) {
-                    console.warn('No se pudo convertir imagen:', err);
                     // Si falla, intentar sin proxy
                     try {
                         const dataUrl = await this.fetchImageAsDataURL(img.src);
                         img.src = dataUrl;
                     } catch (err2) {
-                        console.error('Falló completamente:', err2);
+                        // Silenciar error
                     }
                 }
             }
@@ -150,50 +139,59 @@ export class ShareHelper {
             const clonedButton = cardClone.querySelector('.product-card__button');
             if (clonedButton) {
                 clonedButton.remove();
-                console.log('Boton removido del clon');
             }
             
             // Remover categoría del clon
             const clonedCategory = cardClone.querySelector('.product-card__category');
             if (clonedCategory) {
                 clonedCategory.remove();
-                console.log('Categoría removida del clon');
+            }
+            
+            // Aumentar tamaño de fuentes para mejor legibilidad en estados de WhatsApp
+            const clonedTitle = cardClone.querySelector('.product-card__title');
+            if (clonedTitle) {
+                clonedTitle.style.fontSize = '24px';
+                clonedTitle.style.fontWeight = '700';
+                clonedTitle.style.lineHeight = '1.3';
+            }
+            
+            const clonedDescription = cardClone.querySelector('.product-card__description');
+            if (clonedDescription) {
+                clonedDescription.style.fontSize = '18px';
+                clonedDescription.style.lineHeight = '1.5';
+            }
+            
+            const clonedPrice = cardClone.querySelector('.product-card__price');
+            if (clonedPrice) {
+                clonedPrice.style.fontSize = '28px';
+                clonedPrice.style.fontWeight = '800';
             }
             
             wrapper.appendChild(cardClone);
             document.body.appendChild(wrapper);
-            console.log('📦 Wrapper y clon agregados al DOM');
             
             // Esperar renderizado (más tiempo para las imágenes convertidas)
             await new Promise(resolve => setTimeout(resolve, 300));
-            console.log('Espero 300ms para que carguen las imagenes Data URL');
             
             // Importar html2canvas (más estable que dom-to-image)
-            console.log('Cargando html2canvas...');
             const html2canvas = (await import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.esm.min.js')).default;
-            console.log('html2canvas cargado:', html2canvas);
             
             // Capturar con html2canvas
-            console.log('INICIANDO CAPTURA...');
             const canvas = await html2canvas(wrapper, {
                 backgroundColor: '#E9D5FF',
-                scale: 2,
+                scale: 3,
                 useCORS: false,
                 allowTaint: true,
                 logging: false
             });
-            console.log('Canvas creado:', canvas.width, 'x', canvas.height);
             
             // Convertir canvas a blob
             const blob = await new Promise((resolve) => {
                 canvas.toBlob((b) => resolve(b), 'image/png', 0.95);
             });
-            console.log('BLOB GENERADO:', blob, 'SIZE:', blob ? blob.size : 'null');
             
             // Limpiar wrapper temporal
             document.body.removeChild(wrapper);
-            
-            console.log('✅ Captura exitosa, tamaño:', blob.size, 'bytes');
             
             // Restaurar botón en la card ORIGINAL
             if (button) {
@@ -203,21 +201,16 @@ export class ShareHelper {
             return blob;
             
         } catch (error) {
-            console.error('!!!!! ERROR EN CAPTURA:', error);
-            console.error('!!!!! Error type:', typeof error);
-            console.error('!!!!! Error message:', error.message);
-            console.error('!!!!! Error stack:', error.stack);
-            console.error('!!!!! Error toString:', error.toString());
-            
             // Limpiar wrapper si existe
             if (wrapper && wrapper.parentNode) {
                 try {
                     document.body.removeChild(wrapper);
-                    console.log('Wrapper limpiado despues de error');
                 } catch (cleanupError) {
-                    console.error('Error limpiando wrapper:', cleanupError);
+                    // Silenciar error
                 }
             }
+            
+            // Restaurar botón en la card ORIGINAL
             if (button) {
                 button.style.display = originalButtonDisplay;
             }
@@ -249,16 +242,14 @@ export class ShareHelper {
             // Compartir
             await navigator.share({
                 files: [file],
-                title: 'Viva Store',
+                title: 'Ganga Style',
                 text: 'Mirá mas de mis productos en www.vivastorear.com'
             });
 
-            console.log('Imagen compartida exitosamente');
         } catch (error) {
             if (error.name === 'AbortError') {
-                console.log('Usuario canceló el compartir');
+                // Usuario canceló
             } else {
-                console.error('Error al compartir:', error);
                 // Fallback: descargar la imagen
                 this.downloadImage(imageBlob, productTitle);
             }
@@ -303,23 +294,17 @@ export class ShareHelper {
             button.disabled = true;
             button.style.opacity = '0.6';
             
-            console.log('📸 Iniciando captura en 100ms...');
-            
             // Pequeña pausa para que el botón se vea normal antes de capturar
             await new Promise(resolve => setTimeout(resolve, 100));
 
             // Capturar screenshot
-            console.log('📸 Capturando card...');
             const imageBlob = await this.captureCard(cardElement);
-            console.log('✅ Card capturada, tamaño:', imageBlob.size);
 
             // Mostrar indicador de que se está compartiendo
             button.innerHTML = '<span>Compartiendo...</span>';
 
             // Compartir imagen
-            console.log('📤 Compartiendo imagen...');
             await this.shareImage(imageBlob, productTitle);
-            console.log('✅ Imagen compartida');
 
             // Restaurar botón
             button.innerHTML = originalText;
@@ -328,8 +313,6 @@ export class ShareHelper {
             
             return true; // Éxito
         } catch (error) {
-            console.error('❌ Error en handleShareClick:', error);
-            
             // Restaurar botón
             button.innerHTML = originalText;
             button.disabled = false;
@@ -345,8 +328,6 @@ Stack: ${error.stack ? error.stack.substring(0, 200) : 'No disponible'}
 Navegador: ${navigator.userAgent}
 Tamaño viewport: ${window.innerWidth}x${window.innerHeight}
             `.trim();
-            
-            console.error('DETALLES DEL ERROR:', errorDetails);
             
             // Mostrar error con opción de copiar
             const userMessage = `Error al capturar o compartir la imagen.\n\n${errorDetails}\n\nPor favor, copia este mensaje y compártelo con el desarrollador.`;

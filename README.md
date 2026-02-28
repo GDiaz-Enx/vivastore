@@ -1,4 +1,4 @@
-# Viva Store - Catálogo de Productos
+# Ganga Style - Catálogo de Productos
 
 Catálogo de productos minimalista con integración a Google Sheets. Sin checkout ni pagos, solo visualización y contacto directo por WhatsApp.
 
@@ -46,7 +46,7 @@ www.vivastorear.com        ← Modo normal (WhatsApp directo)
 ## 📁 Estructura del Proyecto
 
 ```
-Viva Store/
+Ganga Style/
 ├── index.html
 ├── src/
 │   ├── domain/              # Lógica de negocio
@@ -108,4 +108,4 @@ Las contribuciones son bienvenidas. Por favor, abre un issue primero para discut
 
 ---
 
-**Viva Store** - Hecho con ❤️ y ☕
+**Ganga Style** - Hecho con ❤️ y ☕

@@ -28,7 +28,6 @@ export class GoogleSheetsAdapter {
         try {
             // Si no hay configuración de API, usar mock directamente
             if (!this.apiKey || this.apiKey.includes('XXXX')) {
-                console.warn('API Key no configurada. Usando datos mock.');
                 return this.getMockProducts();
             }
 
@@ -51,10 +50,7 @@ export class GoogleSheetsAdapter {
             return this.mapToProducts(data.values);
 
         } catch (error) {
-            console.error('Error fetching from Google Sheets:', error);
-            
             if (USE_MOCK_ON_ERROR) {
-                console.log('Usando datos mock como fallback');
                 return this.getMockProducts();
             }
             
@@ -84,7 +80,6 @@ export class GoogleSheetsAdapter {
                         category: row[SHEET_COLUMNS.CATEGORY] || 'General'
                     });
                 } catch (error) {
-                    console.error('Error mapeando producto:', error, row);
                     return null;
                 }
             })
