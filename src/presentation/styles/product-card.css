@@ -50,7 +50,7 @@
     backdrop-filter: blur(10px);
     padding: var(--spacing-xs) var(--spacing-md);
     border-radius: var(--radius-full);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-base);
     font-weight: var(--font-weight-semibold);
     color: var(--color-primary);
     text-transform: uppercase;
