@@ -30,6 +30,28 @@ export class ShareHelper {
     }
 
     /**
+     * Convierte imagen a Data URL para evitar problemas de CORS
+     * @param {HTMLImageElement} img - Imagen a convertir
+     * @returns {Promise<string>} - Data URL de la imagen
+     */
+    static async imageToDataURL(img) {
+        return new Promise((resolve, reject) => {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth || img.width;
+                canvas.height = img.naturalHeight || img.height;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                resolve(canvas.toDataURL('image/png'));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    /**
      * Captura screenshot de una card con márgenes adicionales
      * @param {HTMLElement} cardElement - Elemento de la card a capturar
      * @returns {Promise<Blob>} - Imagen capturada como Blob
@@ -64,11 +86,32 @@ export class ShareHelper {
             
             // CLONAR la card (no moverla!)
             const cardClone = cardElement.cloneNode(true);
+            console.log('Card clonada');
+            
+            // Convertir imágenes externas a Data URLs para evitar CORS
+            const images = cardClone.querySelectorAll('img');
+            console.log('Convirtiendo', images.length, 'imagenes a Data URL...');
+            
+            for (const img of images) {
+                try {
+                    // Obtener la imagen original del DOM
+                    const originalImg = cardElement.querySelector(`img[src="${img.src}"]`);
+                    if (originalImg && originalImg.complete) {
+                        console.log('Convirtiendo imagen:', img.src.substring(0, 50));
+                        const dataUrl = await this.imageToDataURL(originalImg);
+                        img.src = dataUrl;
+                        console.log('Imagen convertida OK');
+                    }
+                } catch (err) {
+                    console.warn('No se pudo convertir imagen:', err);
+                }
+            }
             
             // Remover botón del clon
             const clonedButton = cardClone.querySelector('.product-card__button');
             if (clonedButton) {
                 clonedButton.remove();
+                console.log('Boton removido del clon');
             }
             
             wrapper.appendChild(cardClone);
