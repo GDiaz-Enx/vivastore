@@ -50,12 +50,31 @@ export class ShareHelper {
                 console.log('🙈 Botón ocultado');
             }
             
-            // Crear wrapper temporal con padding alrededor de la card
-            const originalParent = cardElement.parentNode;
+            // Crear wrapper temporal FUERA del viewport con un CLON
             const wrapper = document.createElement('div');
-            wrapper.style.cssText = 'padding: 50px 30px; background-color: #F9FAFB; display: inline-block;';
-            originalParent.insertBefore(wrapper, cardElement);
-            wrapper.appendChild(cardElement);
+            wrapper.style.cssText = `
+                position: fixed;
+                top: -9999px;
+                left: -9999px;
+                padding: 50px 30px;
+                background-color: #F9FAFB;
+                display: inline-block;
+            `;
+            
+            // CLONAR la card (no moverla!)
+            const cardClone = cardElement.cloneNode(true);
+            
+            // Remover botón del clon
+            const clonedButton = cardClone.querySelector('.product-card__button');
+            if (clonedButton) {
+                clonedButton.remove();
+            }
+            
+            wrapper.appendChild(cardClone);
+            document.body.appendChild(wrapper);
+            
+            // Esperar renderizado
+            await new Promise(resolve => setTimeout(resolve, 100));
             
             // Importar dom-to-image-more
             console.log('📦 Cargando dom-to-image...');
@@ -70,13 +89,12 @@ export class ShareHelper {
                 cacheBust: false
             });
             
-            // Restaurar estructura original
-            wrapper.parentNode.insertBefore(cardElement, wrapper);
-            wrapper.remove();
+            // Limpiar wrapper temporal
+            document.body.removeChild(wrapper);
             
             console.log('✅ Captura exitosa, tamaño:', blob.size, 'bytes');
             
-            // Restaurar botón
+            // Restaurar botón en la card ORIGINAL
             if (button) {
                 button.style.display = originalButtonDisplay;
             }
