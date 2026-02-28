@@ -52,6 +52,27 @@ export class ShareHelper {
     }
 
     /**
+     * Descarga imagen desde URL y la convierte a Data URL usando fetch
+     * @param {string} url - URL de la imagen
+     * @returns {Promise<string>} - Data URL de la imagen
+     */
+    static async fetchImageAsDataURL(url) {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        } catch (error) {
+            throw new Error(`Failed to fetch image: ${error.message}`);
+        }
+    }
+
+    /**
      * Captura screenshot de una card con márgenes adicionales
      * @param {HTMLElement} cardElement - Elemento de la card a capturar
      * @returns {Promise<Blob>} - Imagen capturada como Blob
@@ -88,22 +109,31 @@ export class ShareHelper {
             const cardClone = cardElement.cloneNode(true);
             console.log('Card clonada');
             
-            // Convertir imágenes externas a Data URLs para evitar CORS
+            // Convertir imágenes externas a Data URLs usando proxy CORS
             const images = cardClone.querySelectorAll('img');
-            console.log('Convirtiendo', images.length, 'imagenes a Data URL...');
+            console.log('Convirtiendo', images.length, 'imagenes a Data URL con proxy...');
             
             for (const img of images) {
                 try {
-                    // Obtener la imagen original del DOM
-                    const originalImg = cardElement.querySelector(`img[src="${img.src}"]`);
-                    if (originalImg && originalImg.complete) {
+                    if (img.src && !img.src.startsWith('data:')) {
                         console.log('Convirtiendo imagen:', img.src.substring(0, 50));
-                        const dataUrl = await this.imageToDataURL(originalImg);
+                        
+                        // Usar proxy CORS para cargar la imagen
+                        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(img.src)}`;
+                        const dataUrl = await this.fetchImageAsDataURL(proxyUrl);
                         img.src = dataUrl;
+                        
                         console.log('Imagen convertida OK');
                     }
                 } catch (err) {
                     console.warn('No se pudo convertir imagen:', err);
+                    // Si falla, intentar sin proxy
+                    try {
+                        const dataUrl = await this.fetchImageAsDataURL(img.src);
+                        img.src = dataUrl;
+                    } catch (err2) {
+                        console.error('Falló completamente:', err2);
+                    }
                 }
             }
             
@@ -116,10 +146,11 @@ export class ShareHelper {
             
             wrapper.appendChild(cardClone);
             document.body.appendChild(wrapper);
+            console.log('📦 Wrapper y clon agregados al DOM');
             
-            // Esperar renderizado
-            await new Promise(resolve => setTimeout(resolve, 100));
-            console.log('Espero 100ms');
+            // Esperar renderizado (más tiempo para las imágenes convertidas)
+            await new Promise(resolve => setTimeout(resolve, 300));
+            console.log('Espero 300ms para que carguen las imagenes Data URL');
             
             // Importar html2canvas (más estable que dom-to-image)
             console.log('Cargando html2canvas...');
