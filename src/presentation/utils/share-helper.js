@@ -76,18 +76,27 @@ export class ShareHelper {
             
             // Esperar renderizado
             await new Promise(resolve => setTimeout(resolve, 100));
+            console.log('Espero 100ms');
             
-            // Importar dom-to-image-more
-            console.log('📦 Cargando dom-to-image...');
-            const domtoimage = await import('https://cdn.jsdelivr.net/npm/dom-to-image-more@3.0.3/+esm');
-            console.log('✅ dom-to-image cargado');
+            // Importar html2canvas (más estable que dom-to-image)
+            console.log('Cargando html2canvas...');
+            const html2canvas = (await import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.esm.min.js')).default;
+            console.log('html2canvas cargado:', html2canvas);
             
-            // Capturar
-            console.log('INICIANDO CAPTURA toBlob...');
-            const blob = await domtoimage.default.toBlob(wrapper, {
-                quality: 0.95,
-                bgcolor: '#F9FAFB',
-                cacheBust: false
+            // Capturar con html2canvas
+            console.log('INICIANDO CAPTURA...');
+            const canvas = await html2canvas(wrapper, {
+                backgroundColor: '#F9FAFB',
+                scale: 2,
+                useCORS: false,
+                allowTaint: true,
+                logging: false
+            });
+            console.log('Canvas creado:', canvas.width, 'x', canvas.height);
+            
+            // Convertir canvas a blob
+            const blob = await new Promise((resolve) => {
+                canvas.toBlob((b) => resolve(b), 'image/png', 0.95);
             });
             console.log('BLOB GENERADO:', blob, 'SIZE:', blob ? blob.size : 'null');
             
