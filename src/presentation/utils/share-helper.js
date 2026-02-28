@@ -100,7 +100,7 @@ export class ShareHelper {
                 position: fixed;
                 top: -9999px;
                 left: -9999px;
-                padding: 50px 30px;
+                padding: 30px 15px;
                 background: linear-gradient(
                     135deg,
                     #E9D5FF 0%,
