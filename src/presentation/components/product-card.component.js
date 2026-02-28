@@ -57,14 +57,29 @@ export class ProductCardComponent {
         // Configurar evento del botón
         const button = card.querySelector('.product-card__button');
         button.addEventListener('click', async (event) => {
-            // Si es modo share y móvil, capturar y compartir
-            if (ShareHelper.isMobile() && ShareHelper.isShareMode()) {
-                const handled = await ShareHelper.handleShareClick(
-                    event,
-                    card,
-                    this.product.title
-                );
-                if (handled) return; // No continuar con WhatsApp
+            // Verificar si es modo share
+            if (ShareHelper.isShareMode()) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                console.log('🔍 Modo share detectado');
+                console.log('📱 Es móvil?', ShareHelper.isMobile());
+                
+                // Si es móvil, capturar y compartir
+                if (ShareHelper.isMobile()) {
+                    console.log('📸 Iniciando captura...');
+                    const handled = await ShareHelper.handleShareClick(
+                        event,
+                        card,
+                        this.product.title
+                    );
+                    console.log('✅ Captura manejada:', handled);
+                    return; // No continuar con WhatsApp
+                } else {
+                    // En desktop en modo share, avisar que solo funciona en móvil
+                    alert('El modo compartir solo funciona en dispositivos móviles. Abre este enlace desde tu teléfono.');
+                    return;
+                }
             }
             
             // Comportamiento normal: abrir WhatsApp
