@@ -40,76 +40,77 @@ export class ShareHelper {
             const html2canvas = await import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/+esm');
             
             console.log('📦 html2canvas cargado');
+            console.log('📍 Card original:', cardElement);
             
-            // Crear un contenedor temporal con márgenes
-            const wrapper = document.createElement('div');
-            wrapper.style.position = 'absolute';
-            wrapper.style.left = '-9999px';
-            wrapper.style.top = '0';
-            wrapper.style.padding = '50px 30px';
-            wrapper.style.backgroundColor = '#F9FAFB';
-            wrapper.style.width = `${cardElement.offsetWidth + 60}px`;
+            // Scroll al elemento para asegurarse de que esté visible
+            cardElement.scrollIntoView({ behavior: 'instant', block: 'center' });
+            await new Promise(resolve => setTimeout(resolve, 300));
             
-            // Clonar la card
-            const cardClone = cardElement.cloneNode(true);
-            
-            // Asegurarse de que las imágenes estén cargadas en el clon
-            const images = cardClone.querySelectorAll('img');
-            images.forEach(img => {
-                // Forzar que la imagen se muestre con su src actual
-                const src = img.src;
-                img.src = src;
-                img.style.display = 'block';
-            });
-            
-            wrapper.appendChild(cardClone);
-            document.body.appendChild(wrapper);
-            
-            console.log('📐 Dimensiones wrapper:', {
-                width: wrapper.offsetWidth,
-                height: wrapper.offsetHeight
-            });
-            
-            // Esperar un momento para que las imágenes se carguen
-            await new Promise(resolve => setTimeout(resolve, 200));
-            
-            // Configuración para capturar
+            // Configuración simple para capturar directamente el elemento
             const options = {
                 backgroundColor: '#F9FAFB',
                 scale: 2,
                 logging: true,
-                useCORS: true,
+                useCORS: false, // Cambiar a false para evitar problemas CORS
                 allowTaint: true,
-                foreignObjectRendering: true,
-                width: wrapper.offsetWidth,
-                height: wrapper.offsetHeight,
-                windowWidth: wrapper.offsetWidth,
-                windowHeight: wrapper.offsetHeight,
-                imageTimeout: 0,
-                removeContainer: false
+                foreignObjectRendering: false,
+                imageTimeout: 15000,
+                proxy: undefined,
+                onclone: (clonedDoc, clonedElement) => {
+                    console.log('🔄 Clonando documento...');
+                    // Agregar padding al elemento clonado
+                    clonedElement.style.padding = '50px 30px';
+                    clonedElement.style.backgroundColor = '#F9FAFB';
+                    
+                    // Asegurar que las imágenes se muestren
+                    const images = clonedElement.querySelectorAll('img');
+                    console.log('🖼️ Imágenes encontradas:', images.length);
+                    images.forEach((img, index) => {
+                        console.log(`Imagen ${index}:`, img.src);
+                        img.crossOrigin = 'anonymous';
+                        img.style.display = 'block';
+                    });
+                }
             };
 
             console.log('⚙️ Opciones html2canvas:', options);
+            console.log('📸 Iniciando captura...');
 
-            // Capturar el canvas
-            const canvas = await html2canvas.default(wrapper, options);
+            // Capturar el canvas directamente del elemento original
+            const canvas = await html2canvas.default(cardElement, options);
             
             console.log('✅ Canvas creado:', {
                 width: canvas.width,
-                height: canvas.height
+                height: canvas.height,
+                hasData: canvas.toDataURL().length > 100
             });
             
-            // Remover el wrapper temporal
-            document.body.removeChild(wrapper);
+            // Verificar que el canvas no esté vacío
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            let hasContent = false;
+            for (let i = 0; i < data.length; i += 4) {
+                if (data[i] !== 0 || data[i+1] !== 0 || data[i+2] !== 0) {
+                    hasContent = true;
+                    break;
+                }
+            }
+            
+            console.log('🎨 Canvas tiene contenido:', hasContent);
+            
+            if (!hasContent) {
+                throw new Error('El canvas capturado está vacío');
+            }
             
             // Convertir canvas a Blob
             return new Promise((resolve, reject) => {
                 canvas.toBlob((blob) => {
-                    if (blob) {
+                    if (blob && blob.size > 1000) { // Al menos 1KB
                         console.log('✅ Blob creado, tamaño:', blob.size);
                         resolve(blob);
                     } else {
-                        reject(new Error('Error al crear el blob de la imagen'));
+                        reject(new Error('Blob inválido o muy pequeño'));
                     }
                 }, 'image/png', 1.0);
             });
