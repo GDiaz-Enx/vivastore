@@ -111,3 +111,37 @@ ol {
     white-space: nowrap;
     border-width: 0;
 }
+
+/* Force light theme - Override dark mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: light only !important;
+    }
+    
+    *,
+    *::before,
+    *::after {
+        color-scheme: light only !important;
+    }
+    
+    html {
+        background-color: #F9FAFB !important;
+        color: #111827 !important;
+    }
+    
+    body {
+        background-color: #F9FAFB !important;
+        color: #111827 !important;
+    }
+    
+    /* Force all inputs and selects to light theme */
+    input,
+    select,
+    textarea,
+    button {
+        background-color: white !important;
+        color: #111827 !important;
+        border-color: #E5E7EB !important;
+    }
+}
+

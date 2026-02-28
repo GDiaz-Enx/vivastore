@@ -150,3 +150,33 @@
         font-size: var(--font-size-xs);
     }
 }
+
+/* Force light theme for product cards */
+@media (prefers-color-scheme: dark) {
+    .product-card {
+        background: white !important;
+        border-color: #E5E7EB !important;
+    }
+    
+    .product-card__title {
+        color: #111827 !important;
+    }
+    
+    .product-card__description {
+        color: #4B5563 !important;
+    }
+    
+    .product-card__price {
+        color: #9333EA !important;
+    }
+    
+    .product-card__category {
+        background: #F3E8FF !important;
+        color: #7C3AED !important;
+    }
+    
+    .product-card__button {
+        background: #9333EA !important;
+        color: white !important;
+    }
+}

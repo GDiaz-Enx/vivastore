@@ -145,3 +145,28 @@
         padding: var(--spacing-xs) var(--spacing-sm);
     }
 }
+
+/* Force light theme for header */
+@media (prefers-color-scheme: dark) {
+    .header {
+        background: linear-gradient(
+            135deg,
+            #E9D5FF 0%,
+            #DDD6FE 15%,
+            #C084FC 30%,
+            #F0ABFC 50%,
+            #FB923C 70%,
+            #FECACA 85%,
+            #FED7AA 100%
+        ) !important;
+        background-size: 200% 200% !important;
+    }
+    
+    .header__brand {
+        color: white !important;
+    }
+    
+    .header__phone-number {
+        color: white !important;
+    }
+}

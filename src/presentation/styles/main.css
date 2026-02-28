@@ -372,3 +372,51 @@
         content: 'Buscar productos...';
     }
 }
+
+/* Force light theme for all main content */
+@media (prefers-color-scheme: dark) {
+    .main {
+        background-color: transparent !important;
+    }
+    
+    .hero__title {
+        color: #111827 !important;
+    }
+    
+    .hero__subtitle {
+        color: #4B5563 !important;
+    }
+    
+    .search-box {
+        background: white !important;
+        color: #111827 !important;
+    }
+    
+    .search-box__input {
+        color: #111827 !important;
+        background: transparent !important;
+    }
+    
+    .search-box__input::placeholder {
+        color: #9CA3AF !important;
+    }
+    
+    .category-filter__label {
+        color: #374151 !important;
+    }
+    
+    .category-filter__select {
+        background: white !important;
+        color: #374151 !important;
+        border-color: #E5E7EB !important;
+    }
+    
+    .search-results-count {
+        color: #4B5563 !important;
+    }
+    
+    .footer {
+        background: #111827 !important;
+        color: #D1D5DB !important;
+    }
+}
