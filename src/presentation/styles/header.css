@@ -1,0 +1,147 @@
+/**
+ * Header Styles
+ * Estilos del header con gradient y efectos
+ */
+
+.header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--z-sticky);
+    height: var(--header-height);
+    
+    /* Gradient con efecto irregular */
+    background: linear-gradient(
+        135deg,
+        #E9D5FF 0%,
+        #DDD6FE 15%,
+        #C084FC 30%,
+        #F0ABFC 50%,
+        #FB923C 70%,
+        #FECACA 85%,
+        #FED7AA 100%
+    );
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
+    
+    transition: box-shadow var(--transition-base);
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.header--scrolled {
+    box-shadow: var(--shadow-lg);
+}
+
+.header__container {
+    max-width: var(--container-max-width);
+    height: 100%;
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Logo Section */
+.header__logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.header__logo-img {
+    height: 160px;
+    width: auto;
+    object-fit: contain;
+    /* Convertir logo a blanco puro */
+    filter: brightness(0) invert(1);
+}
+
+.header__brand {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-white);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: -0.5px;
+}
+
+/* Contact Section */
+.header__contact {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: rgba(255, 255, 255, 0.95);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(10px);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.header__contact:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.header__phone-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--color-primary);
+}
+
+.header__phone-number {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-900);
+    white-space: nowrap;
+}
+
+.header__phone-number:hover {
+    color: var(--color-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header {
+        height: 60px;
+    }
+    
+    .header__container {
+        padding: 0 var(--spacing-md);
+    }
+    
+    .header__brand {
+        font-size: var(--font-size-lg);
+    }
+    
+    .header__phone-number {
+        font-size: var(--font-size-sm);
+    }
+    
+    .header__logo-img {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header__brand {
+        display: none;
+    }
+    
+    .header__contact {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+}
