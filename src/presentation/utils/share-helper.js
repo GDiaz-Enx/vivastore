@@ -42,16 +42,46 @@ export class ShareHelper {
             console.log('📦 html2canvas cargado');
             console.log('📍 Card original:', cardElement);
             
+            // Ocultar el botón antes de capturar
+            const button = cardElement.querySelector('.product-card__button');
+            const originalButtonDisplay = button ? button.style.display : '';
+            if (button) {
+                button.style.display = 'none';
+                console.log('🙈 Botón oculto');
+            }
+            
             // Scroll al elemento para asegurarse de que esté visible
             cardElement.scrollIntoView({ behavior: 'instant', block: 'center' });
             await new Promise(resolve => setTimeout(resolve, 300));
             
-            // Configuración simple para capturar directamente el elemento
+            // Precargar todas las imágenes antes de capturar
+            const images = cardElement.querySelectorAll('img');
+            console.log('🖼️ Precargando imágenes:', images.length);
+            
+            await Promise.all(Array.from(images).map(img => {
+                return new Promise((resolve) => {
+                    if (img.complete) {
+                        console.log('✅ Imagen ya cargada:', img.src);
+                        resolve();
+                    } else {
+                        img.onload = () => {
+                            console.log('✅ Imagen cargada:', img.src);
+                            resolve();
+                        };
+                        img.onerror = () => {
+                            console.log('❌ Error al cargar imagen:', img.src);
+                            resolve(); // Continuar aunque falle
+                        };
+                    }
+                });
+            }));
+            
+            // Configuración para capturar
             const options = {
                 backgroundColor: '#F9FAFB',
                 scale: 2,
                 logging: true,
-                useCORS: false, // Cambiar a false para evitar problemas CORS
+                useCORS: false,
                 allowTaint: true,
                 foreignObjectRendering: false,
                 imageTimeout: 15000,
@@ -62,13 +92,46 @@ export class ShareHelper {
                     clonedElement.style.padding = '50px 30px';
                     clonedElement.style.backgroundColor = '#F9FAFB';
                     
-                    // Asegurar que las imágenes se muestren
-                    const images = clonedElement.querySelectorAll('img');
-                    console.log('🖼️ Imágenes encontradas:', images.length);
-                    images.forEach((img, index) => {
-                        console.log(`Imagen ${index}:`, img.src);
-                        img.crossOrigin = 'anonymous';
+                    // Asegurar que el botón esté oculto en el clon también
+                    const clonedButton = clonedElement.querySelector('.product-card__button');
+                    if (clonedButton) {
+                        clonedButton.style.display = 'none';
+                    }
+                    
+                    // Forzar que las imágenes se muestren correctamente
+                    const clonedImages = clonedElement.querySelectorAll('img');
+                    console.log('🖼️ Imágenes en clon:', clonedImages.length);
+                    clonedImages.forEach((img, index) => {
+                        console.log(`Imagen ${index}:`, img.src, 'complete:', img.complete);
+                        
+                        // Forzar estilos para que la imagen sea visible
                         img.style.display = 'block';
+                        img.style.opacity = '1';
+                        img.style.visibility = 'visible';
+                        img.style.position = 'absolute';
+                        img.style.top = '0';
+                        img.style.left = '0';
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'cover';
+                        
+                        // Remover cualquier transformación
+                        img.style.transform = 'none';
+                        
+                        // Asegurar que mantenga su src
+                        if (img.src) {
+                            const src = img.src;
+                            img.removeAttribute('crossorigin');
+                            img.setAttribute('src', src);
+                        }
+                    });
+                    
+                    // Asegurar que el contenedor de la imagen también esté correcto
+                    const imageContainers = clonedElement.querySelectorAll('.product-card__image-container');
+                    imageContainers.forEach(container => {
+                        container.style.position = 'relative';
+                        container.style.overflow = 'visible';
+                        container.style.background = '#F9FAFB';
                     });
                 }
             };
@@ -76,7 +139,7 @@ export class ShareHelper {
             console.log('⚙️ Opciones html2canvas:', options);
             console.log('📸 Iniciando captura...');
 
-            // Capturar el canvas directamente del elemento original
+            // Capturar el canvas
             const canvas = await html2canvas.default(cardElement, options);
             
             console.log('✅ Canvas creado:', {
@@ -84,6 +147,12 @@ export class ShareHelper {
                 height: canvas.height,
                 hasData: canvas.toDataURL().length > 100
             });
+            
+            // Restaurar el botón
+            if (button) {
+                button.style.display = originalButtonDisplay;
+                console.log('👁️ Botón restaurado');
+            }
             
             // Verificar que el canvas no esté vacío
             const ctx = canvas.getContext('2d');
@@ -116,6 +185,11 @@ export class ShareHelper {
             });
         } catch (error) {
             console.error('❌ Error al capturar screenshot:', error);
+            // Restaurar el botón en caso de error
+            const button = cardElement.querySelector('.product-card__button');
+            if (button) {
+                button.style.display = '';
+            }
             throw error;
         }
     }
